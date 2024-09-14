@@ -23,11 +23,12 @@ export default function DataTableComp() {
   const [products, setProducts] = useState<Product[]>([]);
   const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
 
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
 
   const [first, setFirst] = useState(0);
   const [rows, setRows] = useState(12);
+  const [page, setPage] = useState(0);
 
   const [inputValue, setInputValue] = useState("");
 
@@ -35,6 +36,7 @@ export default function DataTableComp() {
 
   const fetchApiData = async (pageNo: Number | any) => {
     try {
+      setLoading(true);
       const res = await fetch(
         `https://api.artic.edu/api/v1/artworks?page=${pageNo}`
       );
@@ -55,19 +57,35 @@ export default function DataTableComp() {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const newArr = [];
-
-    for (let i = 0; i < parseInt(inputValue) && i < 12; i++) {
-      newArr.push(products[i]);
+    if (parseInt(inputValue) > 12) {
+      setSelectedProducts((prev) => [...prev, ...products]);
+    } else {
+      setSelectedProducts((prev) => [...prev, ...products.slice(0, parseInt(inputValue))]);
     }
-
-    setSelectedProducts(newArr);
   };
 
   const onPageChange = (event: PaginatorPageChangeEvent) => {
     setFirst(event.first);
     setRows(event.rows);
-    fetchApiData(event.page + 1);    
+    fetchApiData(event.page + 1);
+    setPage(event.page + 1);
+
+    // const remainSelected = parseInt(inputValue) - 12 * event.page;
+    // console.log(products);
+    // const remainProducts = products.slice(0, remainSelected);
+    // setSelectedProducts((prev) => [...prev, ...remainProducts]);
+    // console.log(remainProducts);
+  };
+
+  useEffect(() => {
+    const remainSelected = parseInt(inputValue) - 12 * page;
+    const remainProducts = products.slice(0, remainSelected);
+    setSelectedProducts((prev) => [...prev, ...remainProducts]);
+  }, [first, products]);
+  
+
+  const handleSelectChange = (e: { value: Product[] }) => {
+    setSelectedProducts([...e.value]);
   };
 
   if (loading) return <div>Loading....</div>;
@@ -78,9 +96,7 @@ export default function DataTableComp() {
         <DataTable
           value={products}
           selection={selectedProducts}
-          onSelectionChange={(e: { value: Product[] }) =>
-            setSelectedProducts(e.value)
-          }
+          onSelectionChange={handleSelectChange}
           dataKey="id"
           tableStyle={{
             minWidth: "50rem",
