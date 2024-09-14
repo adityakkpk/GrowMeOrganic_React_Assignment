@@ -1,0 +1,29 @@
+.container {
+    position: relative;
+}
+
+.custom-selector-img {
+    position: absolute;
+    top: 25px;
+    left: 40px;
+    cursor: pointer;
+}
+
+.selection-form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    justify-content: center;
+    align-items: end;
+}
+
+.selection-input {
+    padding: 4px;
+}
+
+.selection-btn {
+    background-color: white;
+    border: 1px solid;
+    border-radius: 4px;
+    padding: 4px 8px;
+}
