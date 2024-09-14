@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, FormEventHandler } from "react";
+import { useState, useEffect, useRef } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import "primereact/resources/themes/lara-light-cyan/theme.css";
@@ -60,7 +60,10 @@ export default function DataTableComp() {
     if (parseInt(inputValue) > 12) {
       setSelectedProducts((prev) => [...prev, ...products]);
     } else {
-      setSelectedProducts((prev) => [...prev, ...products.slice(0, parseInt(inputValue))]);
+      setSelectedProducts((prev) => [
+        ...prev,
+        ...products.slice(0, parseInt(inputValue)),
+      ]);
     }
   };
 
@@ -82,7 +85,6 @@ export default function DataTableComp() {
     const remainProducts = products.slice(0, remainSelected);
     setSelectedProducts((prev) => [...prev, ...remainProducts]);
   }, [first, products]);
-  
 
   const handleSelectChange = (e: { value: Product[] }) => {
     setSelectedProducts([...e.value]);
@@ -101,6 +103,7 @@ export default function DataTableComp() {
           tableStyle={{
             minWidth: "50rem",
           }}
+          selectionMode="multiple"
         >
           <Column
             selectionMode="multiple"
@@ -119,7 +122,7 @@ export default function DataTableComp() {
           src="/chevron-down.svg"
           className="custom-selector-img"
           onClick={(e: React.MouseEvent<HTMLImageElement>) =>
-            op.current.toggle(e)
+            (op.current as OverlayPanel | null)?.toggle(e)
           }
         />
         <OverlayPanel ref={op}>
